@@ -1,0 +1,79 @@
+---
+
+---
+
+<starlight-head-generator>
+  <form>
+    <label for="input">Input</label>
+    <textarea
+      aria-autocomplete="none"
+      aria-placeholder="// TODO ???"
+      autocomplete="off"
+      aria-required="true"
+      aria-multiline="true"
+      id="input"
+      name="input"
+      required></textarea>
+    <input type="reset" />
+    <button type="submit">Generate</button>
+  </form>
+  <div>RESULT</div>
+</starlight-head-generator>
+
+<script>
+  customElements.define(
+    'starlight-head-generator',
+    class StarlightHeadGenerator extends HTMLElement {
+      constructor() {
+        super()
+
+        const form = this.querySelector('form')
+        const textarea = this.querySelector('textarea')
+
+        textarea?.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' || event.shiftKey) {
+            return
+          }
+
+          event.preventDefault()
+
+          form?.dispatchEvent(new Event('submit'))
+        })
+
+        form?.addEventListener('submit', (event) => {
+          if (!(event.target instanceof HTMLFormElement)) {
+            return
+          }
+
+          event.preventDefault()
+
+          const formData = new FormData(event.target)
+          const input = formData.get('input')
+
+          if (typeof input !== 'string') {
+            // TODO(HiDeoo) Possible?
+            return
+          }
+
+          // TODO(HiDeoo)
+          console.log('🚨 [Generator.astro:45] input:', input)
+
+          const parser = new DOMParser()
+          const parsedHtml = parser.parseFromString(input, 'text/html')
+
+          console.log('🚨 [Generator.astro:50] parsedHtml:', parsedHtml)
+
+          const head = parsedHtml.querySelector('head')
+
+          if (!head || head.children.length === 0) {
+            // TODO
+            console.log('NOTHING IN HEAD')
+            return
+          }
+
+          console.log('🚨 [Generator.astro:72] head.:', head.children)
+        })
+      }
+    },
+  )
+</script>
