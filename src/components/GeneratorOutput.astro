@@ -66,6 +66,11 @@ const formats = ['js', 'yaml']
     border-top-right-radius: 0;
   }
 
+  a:focus-visible {
+    outline: 2px solid var(--color-slate-200);
+    outline-offset: 2px;
+  }
+
   a[aria-selected='true'] {
     background-color: var(--color-slate-900);
     font-weight: var(--font-semibold);
@@ -83,7 +88,14 @@ const formats = ['js', 'yaml']
 
   div {
     background-color: var(--color-slate-700);
+    border-bottom-left-radius: var(--rounded);
+    border-bottom-right-radius: var(--rounded);
     padding: var(--size-1) var(--size-2);
+  }
+
+  div:focus-visible {
+    outline: 2px solid var(--color-slate-200);
+    outline-offset: 2px;
   }
 </style>
 

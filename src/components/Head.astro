@@ -1,0 +1,59 @@
+---
+// export interface HeadProps {
+//   metaDescription: string
+//   metaTitle?: string
+// }
+
+// export type Props = HeadProps
+
+// const { metaDescription, metaTitle } = Astro.props
+
+// const author = 'HiDeoo'
+// const isHome = Astro.url.pathname === '/'
+// const isNote = Astro.url.pathname.startsWith('/notes/')
+
+// if (!isHome && !metaTitle) {
+//   throw new Error(`Property 'metaTitle' not found for page '${Astro.url.pathname}'.`)
+// }
+
+// const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
+// const description = metaDescription
+// const title = isHome ? author : `${metaTitle} | ${author}`
+
+// const ogImageUrl = new URL(`/og${Astro.url.pathname === '/' ? '/index' : Astro.url.pathname}.png`, Astro.site)
+// const ogType = isNote ? 'article' : 'website'
+---
+
+<meta charset="utf-8" />
+
+<!-- <title>{title}</title> -->
+
+<!-- <link rel="canonical" href={canonicalUrl} />
+<link rel="icon" href="/images/favicon.ico" sizes="any" />
+<link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" href="/notes/rss.xml" title="HiDeoo's Personal Notes RSS Feed" type="application/rss+xml" /> -->
+
+<!-- <meta name="author" content={author} />
+<meta name="color-scheme" content="dark light" />
+<meta name="description" property="og:description" content={description} />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="hsl(240 11% 9%)" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="hsl(240 26% 95%)" /> -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- <meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:alt" content={description} />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content={title} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalUrl} />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:image:alt" content={description} />
+<meta name="twitter:title" content={title} />
+
+<slot />
+
+<ThemeProvider /> -->
