@@ -1,0 +1,174 @@
+---
+// https://github.com/withastro/starlight/blob/main/packages/starlight/user-components/Tabs.astro
+
+const formats = ['js', 'yaml']
+
+// TODO(HiDeoo) focus
+---
+
+<starlight-head-generator-output>
+  <ul role="tablist">
+    {
+      formats.map((format, index) => (
+        <li role="presentation">
+          <a
+            aria-selected={index === 0}
+            href={`#format-panel-${format}`}
+            id={`format-${format}`}
+            role="tab"
+            tabindex={index === 0 ? 0 : -1}
+          >
+            {format}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  {
+    formats.map((format, index) => (
+      <div
+        aria-labelledby={`format-${format}`}
+        id={`format-panel-${format}`}
+        hidden={index !== 0}
+        role="tabpanel"
+        tabindex={0}
+      />
+    ))
+  }
+</starlight-head-generator-output>
+
+<style>
+  ul {
+    border-bottom: 2px solid var(--color-slate-600);
+    display: flex;
+  }
+
+  li {
+    flex: 1;
+  }
+
+  li:first-child {
+    border-right: 2px solid var(--color-slate-600);
+  }
+
+  a {
+    border-top-left-radius: 0;
+    border-top-right-radius: var(--rounded);
+    display: block;
+    font-size: var(--text-lg);
+    padding: var(--size-2) var(--size-4);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  li:first-child a {
+    border-top-left-radius: var(--rounded);
+    border-top-right-radius: 0;
+  }
+
+  a[aria-selected='true'] {
+    background-color: var(--color-slate-900);
+    font-weight: var(--font-semibold);
+  }
+
+  a:not([aria-selected]) {
+    &:hover {
+      background-color: var(--color-slate-950);
+    }
+
+    &:active {
+      background-color: var(--color-slate-800);
+    }
+  }
+
+  div {
+    background-color: var(--color-slate-700);
+    padding: var(--size-1) var(--size-2);
+  }
+</style>
+
+<script>
+  customElements.define(
+    'starlight-head-generator-output',
+    class StarlightHeadGeneratorOutput extends HTMLElement {
+      #panels: HTMLElement[]
+      #tabs: HTMLAnchorElement[]
+
+      constructor() {
+        super()
+
+        this.#panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
+        this.#tabs = [...this.querySelectorAll<HTMLAnchorElement>('[role="tab"]')]
+
+        for (const [index, tab] of this.#tabs.entries()) {
+          tab.addEventListener('click', (event) => {
+            if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+
+            event.preventDefault()
+
+            if (event.currentTarget !== this.querySelector('[aria-selected]')) {
+              this.#showTabPanelAtIndex(event.currentTarget, index)
+            }
+          })
+
+          tab.addEventListener('keydown', (event) => {
+            if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+
+            const index = this.#tabs.indexOf(event.currentTarget)
+            let nextIndex: number | null = null
+
+            switch (event.key) {
+              case 'ArrowLeft': {
+                nextIndex = index - 1
+                break
+              }
+              case 'ArrowRight': {
+                nextIndex = index + 1
+                break
+              }
+              case 'Home': {
+                nextIndex = 0
+                break
+              }
+              case 'End': {
+                nextIndex = this.#tabs.length - 1
+                break
+              }
+            }
+
+            if (nextIndex === null) return
+
+            const nextTab = this.#tabs[nextIndex]
+
+            if (!nextTab) return
+
+            event.preventDefault()
+
+            this.#showTabPanelAtIndex(nextTab, nextIndex)
+          })
+        }
+      }
+
+      #showTabPanelAtIndex = (tab: HTMLAnchorElement, index: number) => {
+        for (const tab of this.#tabs) {
+          tab.removeAttribute('aria-selected')
+          tab.setAttribute('tabindex', '-1')
+        }
+
+        for (const panel of this.#panels) {
+          panel.hidden = true
+        }
+
+        const panel = this.#panels[index]
+
+        if (panel) {
+          panel.hidden = false
+        }
+
+        tab.removeAttribute('tabindex')
+        tab.setAttribute('aria-selected', 'true')
+        tab.focus()
+      }
+    },
+  )
+</script>

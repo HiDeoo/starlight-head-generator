@@ -20,6 +20,9 @@ devDependencies:
   '@hideoo/tsconfig':
     specifier: 2.0.1
     version: 2.0.1
+  '@unocss/reset':
+    specifier: 0.57.7
+    version: 0.57.7
   astro:
     specifier: 3.5.5
     version: 3.5.5(typescript@5.3.2)
@@ -1299,6 +1302,10 @@ packages:
 
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+    dev: true
+
+  /@unocss/reset@0.57.7:
+    resolution: {integrity: sha512-oN9024WVrMewGbornnAPIpzHeKPIfVmZ5IsZGilWR761TnI5jTjHUkswsVoFx7tZdpCN2/bqS3JK/Ah0aot3NQ==}
     dev: true
 
   /@volar/kit@1.10.10(typescript@5.3.2):
