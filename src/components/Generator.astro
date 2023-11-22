@@ -293,7 +293,7 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
           headConfig.attrs = {}
 
           for (const attr of element.attributes) {
-            headConfig.attrs[attr.name] = attr.value
+            headConfig.attrs[attr.name] = attr.value === '' ? true : attr.value
           }
         }
 
