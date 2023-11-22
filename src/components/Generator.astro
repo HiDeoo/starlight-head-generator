@@ -51,6 +51,7 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
   section.error {
     background-color: var(--color-red-500);
     border: 2px solid var(--color-red-300);
+    font-weight: var(--font-semibold);
   }
 
   section.output {
@@ -201,7 +202,7 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
           const head = parsedHtml.querySelector('head')
 
           if (!head || head.children.length === 0) {
-            throw new Error('// TODO(HiDeoo) ')
+            throw new Error('No valid head tags found.')
           }
 
           this.#showOutput(await this.#getOutput(head.children))
