@@ -3,6 +3,7 @@ import '@unocss/reset/tailwind.css'
 
 import Head from '../components/Head.astro'
 import VisuallyHidden from '../components/VisuallyHidden.astro'
+import Footer from '../components/Footer.astro'
 ---
 
 <!doctype html>
@@ -19,8 +20,7 @@ import VisuallyHidden from '../components/VisuallyHidden.astro'
       </h1>
       <slot />
     </main>
-    <!-- // TODO(HiDeoo)  -->
-    <!-- <Footer /> -->
+    <Footer />
   </body>
 </html>
 
@@ -34,6 +34,7 @@ import VisuallyHidden from '../components/VisuallyHidden.astro'
 
     --color-slate-50: hsl(210 40% 98%);
     --color-slate-200: hsl(214 32% 91%);
+    --color-slate-400: hsl(215 20% 65%);
     --color-slate-500: hsl(215 16% 47%);
     --color-slate-600: hsl(215 19% 35%);
     --color-slate-700: hsl(215 25% 27%);
@@ -64,6 +65,7 @@ import VisuallyHidden from '../components/VisuallyHidden.astro'
     --size-16: 4rem;
     --size-24: 6rem;
 
+    --text-xs: 0.75rem;
     --text-sm: 0.95rem;
     --text-lg: 1.125rem;
     --text-2xl: 1.5rem;
@@ -72,17 +74,18 @@ import VisuallyHidden from '../components/VisuallyHidden.astro'
   }
 
   body {
+    align-items: center;
     background-color: var(--color-slate-900);
     color: var(--color-slate-50);
     display: flex;
+    flex-direction: column;
     font-family: var(--font-base);
-    justify-content: center;
     line-height: 1.8;
   }
 
   main {
     max-width: 768px;
-    padding: var(--size-8) var(--size-4);
+    padding: var(--size-8) var(--size-4) var(--size-4);
     width: 100%;
   }
 
@@ -106,7 +109,7 @@ import VisuallyHidden from '../components/VisuallyHidden.astro'
 
   @media (min-width: 640px) {
     main {
-      padding: var(--size-12) var(--size-8);
+      padding: var(--size-12) var(--size-8) var(--size-8);
     }
 
     h1 {

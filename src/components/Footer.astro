@@ -1,0 +1,37 @@
+<footer>
+  <a href="https://astro.build">
+    <img src="https://astro.badg.es/v2/built-with-astro/tiny.svg" alt="Built with Astro" width="120" height="20" />
+  </a>
+  <span>(for Starlight)</span>
+  <a class="issue" href="https://github.com/HiDeoo/starlight-head-generator/issues/new/choose">Report an issue</a>
+</footer>
+
+<style>
+  footer {
+    align-items: center;
+    color: var(--color-slate-400);
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-xs);
+    gap: var(--size-1);
+    justify-content: center;
+  }
+
+  span {
+    margin-bottom: var(--size-1);
+  }
+
+  a {
+    border-radius: var(--rounded);
+    text-decoration: underline;
+
+    &:is(:hover, :focus-visible) {
+      color: var(--color-slate-50);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-slate-200);
+      outline-offset: 2px;
+    }
+  }
+</style>
