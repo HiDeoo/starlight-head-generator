@@ -258,6 +258,10 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
         this.#output.classList.remove('hidden')
         jsPanel.textContent = output.js
         yamlPanel.textContent = output.yaml
+
+        requestAnimationFrame(() => {
+          this.querySelector<HTMLButtonElement>('button.copy')?.focus()
+        })
       }
 
       async #getOutput(tags: HTMLCollection): Promise<Output> {

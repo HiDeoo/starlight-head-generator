@@ -24,6 +24,14 @@ const formats = ['js', 'yaml']
       ))
     }
   </ul>
+  <button class="copy">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path
+        d="M21,8.94a1.31,1.31,0,0,0-.06-.27l0-.09a1.07,1.07,0,0,0-.19-.28h0l-6-6h0a1.07,1.07,0,0,0-.28-.19.32.32,0,0,0-.09,0A.88.88,0,0,0,14.05,2H10A3,3,0,0,0,7,5V6H6A3,3,0,0,0,3,9V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V18h1a3,3,0,0,0,3-3V9S21,9,21,8.94ZM15,5.41,17.59,8H16a1,1,0,0,1-1-1ZM15,19a1,1,0,0,1-1,1H6a1,1,0,0,1-1-1V9A1,1,0,0,1,6,8H7v7a3,3,0,0,0,3,3h5Zm4-4a1,1,0,0,1-1,1H10a1,1,0,0,1-1-1V5a1,1,0,0,1,1-1h3V7a3,3,0,0,0,3,3h3Z"
+      >
+      </path>
+    </svg>
+  </button>
   {
     formats.map((format, index) =>
       /* prettier-ignore */ <pre aria-labelledby={`format-${format}`} id={`format-panel-${format}`} hidden={index !== 0} role="tabpanel" tabindex={0}><code /></pre>,
@@ -32,6 +40,10 @@ const formats = ['js', 'yaml']
 </starlight-head-generator-output>
 
 <style>
+  starlight-head-generator-output {
+    position: relative;
+  }
+
   ul {
     border-bottom: 2px solid var(--color-slate-600);
     display: flex;
@@ -96,6 +108,38 @@ const formats = ['js', 'yaml']
     font-size: var(--text-sm);
     height: var(--size-24);
   }
+
+  button {
+    background-color: var(--color-slate-900);
+    border: 2px solid var(--color-slate-600);
+    border-radius: var(--rounded-md);
+    padding: var(--size-1-5);
+    position: absolute;
+    right: var(--size-3);
+    top: var(--size-16);
+
+    &:hover {
+      background-color: var(--color-slate-950);
+    }
+
+    &:focus-visible {
+      background-color: var(--color-slate-950);
+      outline: 2px solid var(--color-slate-200);
+      outline-offset: 2px;
+    }
+
+    &:active {
+      background-color: var(--color-slate-800);
+    }
+  }
+
+  svg {
+    --size: var(--size-6);
+
+    fill: currentColor;
+    height: var(--size);
+    width: var(--size);
+  }
 </style>
 
 <script>
@@ -104,12 +148,14 @@ const formats = ['js', 'yaml']
     class StarlightHeadGeneratorOutput extends HTMLElement {
       #panels: HTMLElement[]
       #tabs: HTMLAnchorElement[]
+      #copyButton: HTMLButtonElement
 
       constructor() {
         super()
 
         this.#panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
         this.#tabs = [...this.querySelectorAll<HTMLAnchorElement>('[role="tab"]')]
+        this.#copyButton = this.querySelector('button')!
 
         for (const [index, tab] of this.#tabs.entries()) {
           tab.addEventListener('click', (event) => {
@@ -158,6 +204,19 @@ const formats = ['js', 'yaml']
             this.#showTabPanelAtIndex(nextTab, nextIndex)
           })
         }
+
+        this.#copyButton.addEventListener('click', () => {
+          const code = this.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden]) code')
+
+          if (!code || !code.textContent) {
+            console.error('Could not find code to copy to clipboard.')
+            return
+          }
+
+          navigator.clipboard.writeText(code.textContent)
+
+          // TODO(HiDeoo) notification
+        })
       }
 
       #showTabPanelAtIndex = (tab: HTMLAnchorElement, index: number) => {
