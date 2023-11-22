@@ -1,5 +1,6 @@
 ---
 import GeneratorOutput from './GeneratorOutput.astro'
+import VisuallyHidden from './VisuallyHidden.astro'
 
 const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site="ABCDEFG" defer></script>`
 ---
@@ -7,17 +8,19 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
 <starlight-head-generator>
   <section>
     <form>
-      <label for="input">Enter the tags to add to your Starlight <code>`&lt;head&gt;`</code>:</label>
-      <textarea
-        aria-autocomplete="none"
-        aria-multiline="true"
-        aria-required="true"
-        autocomplete="off"
-        id="input"
-        name="input"
-        {placeholder}
-        required
-        spellcheck="false"></textarea>
+      <label>
+        <VisuallyHidden>Enter the tags to add to your Starlight head:</VisuallyHidden>
+        <span aria-hidden="true">Enter the tags to add to your Starlight <code>`&lt;head&gt;`</code>:</span>
+        <textarea
+          aria-autocomplete="none"
+          aria-multiline="true"
+          aria-required="true"
+          autocomplete="off"
+          name="input"
+          {placeholder}
+          required
+          spellcheck="false"></textarea>
+      </label>
       <div class="controls">
         <input type="reset" />
         <button type="submit">Generate</button>
@@ -70,7 +73,10 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
   }
 
   label {
+    display: flex;
+    flex-direction: column;
     font-weight: var(--font-semibold);
+    gap: var(--size-3);
     line-height: 1.4;
     margin-bottom: var(--size-4);
   }
@@ -86,9 +92,9 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
     border-radius: var(--rounded);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
+    font-weight: var(--font-normal);
     height: var(--size-24);
     line-height: 1.5;
-    margin-bottom: var(--size-4);
     padding: var(--size-1) var(--size-2);
     resize: none;
   }
