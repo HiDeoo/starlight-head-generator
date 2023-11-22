@@ -2,8 +2,6 @@
 // https://github.com/withastro/starlight/blob/main/packages/starlight/user-components/Tabs.astro
 
 const formats = ['js', 'yaml']
-
-// TODO(HiDeoo) focus
 ---
 
 <starlight-head-generator-output>
@@ -32,6 +30,7 @@ const formats = ['js', 'yaml']
       </path>
     </svg>
   </button>
+  <div class="notification">Copied</div>
   {
     formats.map((format, index) =>
       /* prettier-ignore */ <pre aria-labelledby={`format-${format}`} id={`format-panel-${format}`} hidden={index !== 0} role="tabpanel" tabindex={0}><code /></pre>,
@@ -140,6 +139,22 @@ const formats = ['js', 'yaml']
     height: var(--size);
     width: var(--size);
   }
+
+  .notification {
+    background-color: var(--color-green-800);
+    border-radius: var(--rounded-md);
+    border: 2px solid var(--color-green-300);
+    display: none;
+    font-size: var(--text-sm);
+    padding: var(--size-1) var(--size-3);
+    position: absolute;
+    right: var(--size-16);
+    top: var(--size-16);
+  }
+
+  .notification.visible {
+    display: block;
+  }
 </style>
 
 <script>
@@ -148,14 +163,16 @@ const formats = ['js', 'yaml']
     class StarlightHeadGeneratorOutput extends HTMLElement {
       #panels: HTMLElement[]
       #tabs: HTMLAnchorElement[]
-      #copyButton: HTMLButtonElement
+      #copyButton: HTMLButtonElement | null
+      #notification: HTMLElement | null
 
       constructor() {
         super()
 
         this.#panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
         this.#tabs = [...this.querySelectorAll<HTMLAnchorElement>('[role="tab"]')]
-        this.#copyButton = this.querySelector('button')!
+        this.#copyButton = this.querySelector('button')
+        this.#notification = this.querySelector('.notification')
 
         for (const [index, tab] of this.#tabs.entries()) {
           tab.addEventListener('click', (event) => {
@@ -205,17 +222,24 @@ const formats = ['js', 'yaml']
           })
         }
 
-        this.#copyButton.addEventListener('click', () => {
+        this.#copyButton?.addEventListener('click', async () => {
           const code = this.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden]) code')
 
-          if (!code || !code.textContent) {
-            console.error('Could not find code to copy to clipboard.')
-            return
+          try {
+            if (!code || !code.textContent) {
+              throw new Error('Could not find any code to copy.')
+            }
+
+            this.#notification?.classList.add('visible')
+
+            await navigator.clipboard.writeText(code.textContent)
+
+            setTimeout(() => {
+              this.#notification?.classList.remove('visible')
+            }, 1_500)
+          } catch (error) {
+            console.error('Could not copy code to clipboard.', error)
           }
-
-          navigator.clipboard.writeText(code.textContent)
-
-          // TODO(HiDeoo) notification
         })
       }
 
