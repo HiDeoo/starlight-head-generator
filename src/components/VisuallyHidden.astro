@@ -1,0 +1,21 @@
+---
+// https://github.com/twbs/bootstrap/blob/23e50829f958ea1d741d63e2781716be037e4644/scss/mixins/_visually-hidden.scss
+---
+
+<span class="visually-hidden">
+  <slot />
+</span>
+
+<style>
+  span {
+    border: 0px;
+    clip: rect(0, 0, 0, 0);
+    height: var(--size-px);
+    margin: var(--size-npx);
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: var(--size-px);
+  }
+</style>

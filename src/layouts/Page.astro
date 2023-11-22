@@ -2,6 +2,7 @@
 import '@unocss/reset/tailwind.css'
 
 import Head from '../components/Head.astro'
+import VisuallyHidden from '../components/VisuallyHidden.astro'
 ---
 
 <!doctype html>
@@ -12,7 +13,10 @@ import Head from '../components/Head.astro'
   </head>
   <body>
     <main id="content">
-      <h1>Starlight <code>`&lt;head&gt;`</code> Generator</h1>
+      <h1>
+        <VisuallyHidden>Starlight Head Generator</VisuallyHidden>
+        <span aria-hidden="true">Starlight <code>`&lt;head&gt;`</code> Generator</span>
+      </h1>
       <slot />
     </main>
     <!-- // TODO(HiDeoo)  -->
