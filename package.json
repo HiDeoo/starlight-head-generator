@@ -1,0 +1,54 @@
+{
+  "name": "starlight-head-generator",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Quickly generate the configuration to add custom tags to your Starlight website head",
+  "author": "HiDeoo <github@hideoo.dev> (https://hideoo.dev)",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "prettier -c --cache . && eslint . --cache --max-warnings=0 && astro check && tsc --noEmit",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.3.1",
+    "@hideoo/eslint-config": "2.0.2",
+    "@hideoo/prettier-config": "2.0.0",
+    "@hideoo/tsconfig": "2.0.1",
+    "@unocss/reset": "0.57.7",
+    "astro": "3.5.5",
+    "eslint": "8.54.0",
+    "husky": "8.0.3",
+    "lint-staged": "15.1.0",
+    "prettier": "3.1.0",
+    "prettier-plugin-astro": "0.12.2",
+    "typescript": "5.3.2",
+    "yaml": "2.3.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@8.10.5",
+  "private": true,
+  "sideEffects": false,
+  "keywords": [
+    "starlight",
+    "head",
+    "configuration",
+    "html",
+    "js",
+    "yaml"
+  ],
+  "homepage": "https://github.com/HiDeoo/starlight-head-generator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HiDeoo/starlight-head-generator.git"
+  },
+  "bugs": "https://github.com/HiDeoo/starlight-head-generator/issues",
+  "lint-staged": {
+    "**/*": "prettier -w -u --cache",
+    "**/*.{js,jsx,ts,tsx,cjs,mjs}": "eslint --cache --max-warnings=0"
+  }
+}

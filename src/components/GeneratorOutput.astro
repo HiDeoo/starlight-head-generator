@@ -1,0 +1,270 @@
+---
+// https://github.com/withastro/starlight/blob/main/packages/starlight/user-components/Tabs.astro
+
+const formats = ['js', 'yaml']
+---
+
+<starlight-head-generator-output>
+  <ul role="tablist">
+    {
+      formats.map((format, index) => (
+        <li role="presentation">
+          <a
+            aria-selected={index === 0}
+            href={`#format-panel-${format}`}
+            id={`format-${format}`}
+            role="tab"
+            tabindex={index === 0 ? 0 : -1}
+          >
+            {format}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <button aria-label="Copy code" class="copy">
+    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path
+        d="M21,8.94a1.31,1.31,0,0,0-.06-.27l0-.09a1.07,1.07,0,0,0-.19-.28h0l-6-6h0a1.07,1.07,0,0,0-.28-.19.32.32,0,0,0-.09,0A.88.88,0,0,0,14.05,2H10A3,3,0,0,0,7,5V6H6A3,3,0,0,0,3,9V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V18h1a3,3,0,0,0,3-3V9S21,9,21,8.94ZM15,5.41,17.59,8H16a1,1,0,0,1-1-1ZM15,19a1,1,0,0,1-1,1H6a1,1,0,0,1-1-1V9A1,1,0,0,1,6,8H7v7a3,3,0,0,0,3,3h5Zm4-4a1,1,0,0,1-1,1H10a1,1,0,0,1-1-1V5a1,1,0,0,1,1-1h3V7a3,3,0,0,0,3,3h3Z"
+      >
+      </path>
+    </svg>
+  </button>
+  <div class="notification">Copied</div>
+  {
+    formats.map((format, index) =>
+      /* prettier-ignore */ <pre aria-labelledby={`format-${format}`} id={`format-panel-${format}`} hidden={index !== 0} role="tabpanel" tabindex={0}><code /></pre>,
+    )
+  }
+</starlight-head-generator-output>
+
+<style>
+  starlight-head-generator-output {
+    display: block;
+    position: relative;
+  }
+
+  ul {
+    border-bottom: 2px solid var(--color-slate-600);
+    display: flex;
+  }
+
+  li {
+    flex: 1;
+  }
+
+  li:first-child {
+    border-right: 2px solid var(--color-slate-600);
+  }
+
+  a {
+    border-top-left-radius: 0;
+    border-top-right-radius: var(--rounded);
+    display: block;
+    font-size: var(--text-lg);
+    padding: var(--size-2) var(--size-4);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  li:first-child a {
+    border-top-left-radius: var(--rounded);
+    border-top-right-radius: 0;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-slate-200);
+    outline-offset: 2px;
+  }
+
+  a[aria-selected='true'] {
+    background-color: var(--color-slate-900);
+    font-weight: var(--font-semibold);
+  }
+
+  a:not([aria-selected]) {
+    &:hover {
+      background-color: var(--color-slate-950);
+    }
+
+    &:active {
+      background-color: var(--color-slate-800);
+    }
+  }
+
+  pre {
+    background-color: var(--color-slate-700);
+    border-bottom-left-radius: var(--rounded);
+    border-bottom-right-radius: var(--rounded);
+    overflow-x: auto;
+    padding: var(--size-1) var(--size-2);
+  }
+
+  pre:focus-visible {
+    outline: 2px solid var(--color-slate-200);
+    outline-offset: 2px;
+  }
+
+  code {
+    font-size: var(--text-sm);
+    height: var(--size-24);
+  }
+
+  button {
+    background-color: var(--color-slate-900);
+    border: 2px solid var(--color-slate-600);
+    border-radius: var(--rounded-md);
+    padding: var(--size-1-5);
+    position: absolute;
+    right: var(--size-3);
+    top: var(--size-16);
+
+    &:hover {
+      background-color: var(--color-slate-950);
+    }
+
+    &:is(:focus, :focus-visible) {
+      background-color: var(--color-slate-950);
+      outline: 2px solid var(--color-slate-200);
+      outline-offset: 2px;
+    }
+
+    &:active {
+      background-color: var(--color-slate-800);
+    }
+  }
+
+  svg {
+    --size: var(--size-6);
+
+    fill: currentColor;
+    height: var(--size);
+    width: var(--size);
+  }
+
+  .notification {
+    background-color: var(--color-green-800);
+    border-radius: var(--rounded-md);
+    border: 2px solid var(--color-green-300);
+    display: none;
+    font-size: var(--text-sm);
+    padding: var(--size-1) var(--size-3);
+    position: absolute;
+    right: var(--size-16);
+    top: var(--size-16);
+  }
+
+  .notification.visible {
+    display: block;
+  }
+</style>
+
+<script>
+  customElements.define(
+    'starlight-head-generator-output',
+    class StarlightHeadGeneratorOutput extends HTMLElement {
+      #panels: HTMLElement[]
+      #tabs: HTMLAnchorElement[]
+      #copyButton: HTMLButtonElement | null
+      #notification: HTMLElement | null
+
+      constructor() {
+        super()
+
+        this.#panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
+        this.#tabs = [...this.querySelectorAll<HTMLAnchorElement>('[role="tab"]')]
+        this.#copyButton = this.querySelector('button')
+        this.#notification = this.querySelector('.notification')
+
+        for (const [index, tab] of this.#tabs.entries()) {
+          tab.addEventListener('click', (event) => {
+            if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+
+            event.preventDefault()
+
+            if (event.currentTarget !== this.querySelector('[aria-selected]')) {
+              this.#showTabPanelAtIndex(event.currentTarget, index)
+            }
+          })
+
+          tab.addEventListener('keydown', (event) => {
+            if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+
+            const index = this.#tabs.indexOf(event.currentTarget)
+            let nextIndex: number | null = null
+
+            switch (event.key) {
+              case 'ArrowLeft': {
+                nextIndex = index - 1
+                break
+              }
+              case 'ArrowRight': {
+                nextIndex = index + 1
+                break
+              }
+              case 'Home': {
+                nextIndex = 0
+                break
+              }
+              case 'End': {
+                nextIndex = this.#tabs.length - 1
+                break
+              }
+            }
+
+            if (nextIndex === null) return
+
+            const nextTab = this.#tabs[nextIndex]
+
+            if (!nextTab) return
+
+            event.preventDefault()
+
+            this.#showTabPanelAtIndex(nextTab, nextIndex)
+          })
+        }
+
+        this.#copyButton?.addEventListener('click', async () => {
+          const code = this.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden]) code')
+
+          try {
+            if (!code || !code.textContent) {
+              throw new Error('Could not find any code to copy.')
+            }
+
+            this.#notification?.classList.add('visible')
+
+            await navigator.clipboard.writeText(code.textContent)
+
+            setTimeout(() => {
+              this.#notification?.classList.remove('visible')
+            }, 1500)
+          } catch (error) {
+            console.error('Could not copy code to clipboard.', error)
+          }
+        })
+      }
+
+      #showTabPanelAtIndex = (tab: HTMLAnchorElement, index: number) => {
+        for (const tab of this.#tabs) {
+          tab.removeAttribute('aria-selected')
+          tab.setAttribute('tabindex', '-1')
+        }
+
+        for (const panel of this.#panels) {
+          panel.hidden = true
+        }
+
+        const panel = this.#panels[index]
+
+        if (panel) {
+          panel.hidden = false
+        }
+
+        tab.removeAttribute('tabindex')
+        tab.setAttribute('aria-selected', 'true')
+        tab.focus()
+      }
+    },
+  )
+</script>

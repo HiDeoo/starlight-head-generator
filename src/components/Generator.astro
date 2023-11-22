@@ -1,0 +1,315 @@
+---
+import GeneratorOutput from './GeneratorOutput.astro'
+import VisuallyHidden from './VisuallyHidden.astro'
+
+const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site="ABCDEFG" defer></script>`
+---
+
+<starlight-head-generator>
+  <section>
+    <form>
+      <label>
+        <VisuallyHidden>Enter the tags to add to your Starlight head:</VisuallyHidden>
+        <span aria-hidden="true">Enter the tags to add to your Starlight <code>`&lt;head&gt;`</code>:</span>
+        <textarea
+          aria-autocomplete="none"
+          aria-multiline="true"
+          aria-required="true"
+          autocomplete="off"
+          name="input"
+          {placeholder}
+          required
+          spellcheck="false"></textarea>
+      </label>
+      <div class="controls">
+        <input type="reset" />
+        <button type="submit">Generate</button>
+      </div>
+    </form>
+  </section>
+  <section class="loading hidden">Generating… Please wait.</section>
+  <section class="error hidden"></section>
+  <section class="output hidden">
+    <GeneratorOutput />
+  </section>
+</starlight-head-generator>
+
+<style>
+  section {
+    background-color: var(--color-slate-800);
+    border: 2px solid var(--color-slate-600);
+    border-radius: var(--rounded-md);
+    padding: var(--size-4);
+  }
+
+  section.loading {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    text-align: center;
+  }
+
+  section.error {
+    background-color: var(--color-red-500);
+    border: 2px solid var(--color-red-300);
+    font-weight: var(--font-semibold);
+  }
+
+  section.output {
+    padding: 0;
+  }
+
+  section + section {
+    margin-top: var(--size-4);
+  }
+
+  @media (min-width: 640px) {
+    section + section {
+      margin-top: var(--size-8);
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: var(--font-semibold);
+    gap: var(--size-3);
+    line-height: 1.4;
+    margin-bottom: var(--size-4);
+  }
+
+  code {
+    font-size: var(--text-sm);
+    line-height: 1.2;
+  }
+
+  textarea {
+    background-color: var(--color-slate-700);
+    border: 2px solid var(--color-slate-500);
+    border-radius: var(--rounded);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-normal);
+    height: var(--size-24);
+    line-height: 1.5;
+    padding: var(--size-1) var(--size-2);
+    resize: none;
+  }
+
+  textarea:focus-visible {
+    outline: 2px solid var(--color-slate-200);
+    outline-offset: 2px;
+  }
+
+  textarea::placeholder {
+    color: var(--color-slate-500);
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-3);
+  }
+
+  :is(button, input[type='reset']) {
+    background-color: var(--color-slate-900);
+    border: 2px solid var(--color-slate-700);
+    border-radius: var(--rounded);
+    cursor: pointer;
+    flex-basis: 50%;
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    padding: var(--size-1) var(--size-4);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-slate-950);
+    }
+
+    &:focus-visible {
+      background-color: var(--color-slate-950);
+      outline: 2px solid var(--color-slate-200);
+      outline-offset: 2px;
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--color-slate-800);
+    }
+
+    &:disabled {
+      color: var(--color-slate-200);
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
+  }
+
+  @media (min-width: 480px) {
+    .controls {
+      flex-direction: row;
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  customElements.define(
+    'starlight-head-generator',
+    class StarlightHeadGenerator extends HTMLElement {
+      #form: HTMLFormElement | null
+      #loading: HTMLElement | null
+      #error: HTMLElement | null
+      #output: HTMLElement | null
+
+      constructor() {
+        super()
+
+        this.#form = this.querySelector('form')
+        this.#loading = this.querySelector('.loading')
+        this.#error = this.querySelector('.error')
+        this.#output = this.querySelector('.output')
+
+        this.#form?.addEventListener('submit', this.#handleSubmit)
+        this.#form?.addEventListener('reset', this.#handleReset)
+        this.querySelector('textarea')?.addEventListener('keydown', this.#handleInputKeyDown)
+      }
+
+      #handleSubmit = async (event: SubmitEvent) => {
+        this.#resetUI()
+
+        if (!(event.target instanceof HTMLFormElement)) return
+
+        if (!event.target.checkValidity()) {
+          event.target.reportValidity()
+          return
+        }
+
+        event.preventDefault()
+
+        const input = new FormData(event.target).get('input')
+        if (typeof input !== 'string') return
+
+        this.#setFormEnabled(false)
+
+        try {
+          const parser = new DOMParser()
+          const parsedHtml = parser.parseFromString(input, 'text/html')
+          const head = parsedHtml.querySelector('head')
+
+          if (!head || head.children.length === 0) {
+            throw new Error('No valid head tags found.')
+          }
+
+          this.#showOutput(await this.#getOutput(head.children))
+        } catch (error) {
+          this.#showError(error instanceof Error ? error.message : String(error))
+        } finally {
+          this.#setFormEnabled(true)
+        }
+      }
+
+      #handleReset = () => {
+        this.#resetUI()
+      }
+
+      #handleInputKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== 'Enter' || event.shiftKey) {
+          return
+        }
+
+        event.preventDefault()
+
+        this.#form?.dispatchEvent(new Event('submit', { cancelable: true }))
+      }
+
+      #setFormEnabled = (enabled: boolean) => {
+        this.#loading?.classList.toggle('hidden', enabled)
+
+        for (const element of (this.#form?.querySelectorAll('button, input, textarea') ?? []) as NodeListOf<
+          HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement
+        >) {
+          element.disabled = !enabled
+        }
+      }
+
+      #resetUI = () => {
+        this.#loading?.classList.add('hidden')
+        this.#error?.classList.add('hidden')
+        this.#output?.classList.add('hidden')
+      }
+
+      #showError = (msg: string) => {
+        if (!this.#error) return
+
+        this.#error.classList.remove('hidden')
+        this.#error.textContent = msg
+
+        requestAnimationFrame(() => {
+          this.querySelector('textarea')?.focus()
+        })
+      }
+
+      #showOutput = (output: Output) => {
+        if (!this.#output) return
+
+        const jsPanel = this.#output.querySelector('#format-panel-js code')
+        const yamlPanel = this.#output.querySelector('#format-panel-yaml code')
+
+        if (!jsPanel || !yamlPanel) return
+
+        this.#output.classList.remove('hidden')
+        jsPanel.textContent = output.js
+        yamlPanel.textContent = output.yaml
+
+        requestAnimationFrame(() => {
+          this.querySelector<HTMLButtonElement>('button.copy')?.focus()
+        })
+      }
+
+      async #getOutput(tags: HTMLCollection): Promise<Output> {
+        const headConfigs = [...tags].map(this.#getHeadConfigFromElement)
+
+        const js = JSON.stringify(headConfigs, null, 2)
+
+        const { stringify } = await import('yaml')
+        const yaml = stringify(headConfigs)
+
+        return { js, yaml }
+      }
+
+      #getHeadConfigFromElement(element: Element): HeadConfig {
+        const headConfig: HeadConfig = { tag: element.tagName.toLowerCase() }
+
+        if (element.textContent && element.textContent.trim().length > 0) {
+          headConfig.content = element.textContent
+        }
+
+        if (element.attributes.length > 0) {
+          headConfig.attrs = {}
+
+          for (const attr of element.attributes) {
+            headConfig.attrs[attr.name] = attr.value
+          }
+        }
+
+        return headConfig
+      }
+    },
+  )
+
+  interface HeadConfig {
+    attrs?: Record<string, string | boolean | undefined>
+    content?: string
+    tag: string
+  }
+
+  interface Output {
+    js: string
+    yaml: string
+  }
+</script>
