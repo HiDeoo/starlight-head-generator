@@ -241,6 +241,10 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
 
         this.#error.classList.remove('hidden')
         this.#error.textContent = msg
+
+        requestAnimationFrame(() => {
+          this.querySelector('textarea')?.focus()
+        })
       }
 
       #showOutput = (output: Output) => {
