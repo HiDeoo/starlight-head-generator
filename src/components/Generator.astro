@@ -230,9 +230,9 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
       #setFormEnabled = (enabled: boolean) => {
         this.#loading?.classList.toggle('hidden', enabled)
 
-        for (const element of this.#form?.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>(
-          'button, input, textarea',
-        ) ?? []) {
+        for (const element of (this.#form?.querySelectorAll('button, input, textarea') ?? []) as NodeListOf<
+          HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement
+        >) {
           element.disabled = !enabled
         }
       }
