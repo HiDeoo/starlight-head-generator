@@ -1,4 +1,6 @@
 ---
+// Favicon designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0
+
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
 const description = 'Quickly generate the configuration to add custom tags to your Starlight website head.'
 const ogImageUrl = new URL('/images/og.png', Astro.site)
@@ -10,7 +12,6 @@ const title = 'Starlight Head Generator'
 <title>{title}</title>
 
 <link rel="canonical" href={canonicalUrl} />
-<link rel="icon" href="/images/favicon.ico" sizes="any" />
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
 
 <meta name="author" content="HiDeoo" />
