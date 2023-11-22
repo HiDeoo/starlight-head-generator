@@ -24,8 +24,9 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
       </div>
     </form>
   </section>
-  <section class="error hidden" id="error"></section>
-  <section class="output hidden" id="output">
+  <section class="loading hidden">Generating… Please wait.</section>
+  <section class="error hidden"></section>
+  <section class="output hidden">
     <GeneratorOutput />
   </section>
 </starlight-head-generator>
@@ -36,6 +37,12 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
     border: 2px solid var(--color-slate-600);
     border-radius: var(--rounded-md);
     padding: var(--size-4);
+  }
+
+  section.loading {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    text-align: center;
   }
 
   section.error {
@@ -101,8 +108,7 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
     gap: var(--size-3);
   }
 
-  button,
-  input[type='reset'] {
+  :is(button, input[type='reset']) {
     background-color: var(--color-slate-900);
     border: 2px solid var(--color-slate-700);
     border-radius: var(--rounded);
@@ -111,20 +117,26 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
     font-size: var(--text-lg);
     font-weight: var(--font-semibold);
     padding: var(--size-1) var(--size-4);
-  }
 
-  :is(button, input[type='reset']):hover {
-    background-color: var(--color-slate-950);
-  }
+    &:hover:not(:disabled) {
+      background-color: var(--color-slate-950);
+    }
 
-  :is(button, input[type='reset']):focus-visible {
-    background-color: var(--color-slate-950);
-    outline: 2px solid var(--color-slate-200);
-    outline-offset: 2px;
-  }
+    &:focus-visible {
+      background-color: var(--color-slate-950);
+      outline: 2px solid var(--color-slate-200);
+      outline-offset: 2px;
+    }
 
-  :is(button:hover, input[type='reset']):active {
-    background-color: var(--color-slate-800);
+    &:active:not(:disabled) {
+      background-color: var(--color-slate-800);
+    }
+
+    &:disabled {
+      color: var(--color-slate-200);
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
   }
 
   @media (min-width: 480px) {
@@ -143,6 +155,7 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
     'starlight-head-generator',
     class StarlightHeadGenerator extends HTMLElement {
       #form: HTMLFormElement | null
+      #loading: HTMLElement | null
       #error: HTMLElement | null
       #output: HTMLElement | null
 
@@ -150,15 +163,16 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
         super()
 
         this.#form = this.querySelector('form')
-        this.#error = this.querySelector('#error')
-        this.#output = this.querySelector('#output')
+        this.#loading = this.querySelector('.loading')
+        this.#error = this.querySelector('.error')
+        this.#output = this.querySelector('.output')
 
         this.#form?.addEventListener('submit', this.#handleSubmit)
         this.#form?.addEventListener('reset', this.#handleReset)
         this.querySelector('textarea')?.addEventListener('keydown', this.#handleInputKeyDown)
       }
 
-      #handleSubmit = (event: SubmitEvent) => {
+      #handleSubmit = async (event: SubmitEvent) => {
         this.#resetUI()
 
         if (!(event.target instanceof HTMLFormElement)) return
@@ -173,16 +187,23 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
         const input = new FormData(event.target).get('input')
         if (typeof input !== 'string') return
 
-        const parser = new DOMParser()
-        const parsedHtml = parser.parseFromString(input, 'text/html')
-        const head = parsedHtml.querySelector('head')
+        this.#setFormEnabled(false)
 
-        if (!head || head.children.length === 0) {
-          this.#showError('// TODO(HiDeoo) ')
-          return
+        try {
+          const parser = new DOMParser()
+          const parsedHtml = parser.parseFromString(input, 'text/html')
+          const head = parsedHtml.querySelector('head')
+
+          if (!head || head.children.length === 0) {
+            throw new Error('// TODO(HiDeoo) ')
+          }
+
+          this.#showOutput(await this.#getOutput(head.children))
+        } catch (error) {
+          this.#showError(error instanceof Error ? error.message : String(error))
+        } finally {
+          this.#setFormEnabled(true)
         }
-
-        this.#showOutput(this.#getOutput(head.children))
       }
 
       #handleReset = () => {
@@ -199,7 +220,18 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
         this.#form?.dispatchEvent(new Event('submit', { cancelable: true }))
       }
 
+      #setFormEnabled = (enabled: boolean) => {
+        this.#loading?.classList.toggle('hidden', enabled)
+
+        for (const element of this.#form?.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>(
+          'button, input, textarea',
+        ) ?? []) {
+          element.disabled = !enabled
+        }
+      }
+
       #resetUI = () => {
+        this.#loading?.classList.add('hidden')
         this.#error?.classList.add('hidden')
         this.#output?.classList.add('hidden')
       }
@@ -214,8 +246,8 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
       #showOutput = (output: Output) => {
         if (!this.#output) return
 
-        const jsPanel = this.#output.querySelector('#format-panel-js')
-        const yamlPanel = this.#output.querySelector('#format-panel-yaml')
+        const jsPanel = this.#output.querySelector('#format-panel-js code')
+        const yamlPanel = this.#output.querySelector('#format-panel-yaml code')
 
         if (!jsPanel || !yamlPanel) return
 
@@ -224,13 +256,15 @@ const placeholder = `<script src="https://cdn.usefathom.com/script.js" data-site
         yamlPanel.textContent = output.yaml
       }
 
-      #getOutput(tags: HTMLCollection): Output {
+      async #getOutput(tags: HTMLCollection): Promise<Output> {
         const headConfigs = [...tags].map(this.#getHeadConfigFromElement)
 
-        return {
-          js: JSON.stringify(headConfigs, null, 2),
-          yaml: '// TODO(HiDeoo) ',
-        }
+        const js = JSON.stringify(headConfigs, null, 2)
+
+        const { stringify } = await import('yaml')
+        const yaml = stringify(headConfigs)
+
+        return { js, yaml }
       }
 
       #getHeadConfigFromElement(element: Element): HeadConfig {

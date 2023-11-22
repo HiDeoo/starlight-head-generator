@@ -25,15 +25,9 @@ const formats = ['js', 'yaml']
     }
   </ul>
   {
-    formats.map((format, index) => (
-      <div
-        aria-labelledby={`format-${format}`}
-        id={`format-panel-${format}`}
-        hidden={index !== 0}
-        role="tabpanel"
-        tabindex={0}
-      />
-    ))
+    formats.map((format, index) =>
+      /* prettier-ignore */ <pre aria-labelledby={`format-${format}`} id={`format-panel-${format}`} hidden={index !== 0} role="tabpanel" tabindex={0}><code /></pre>,
+    )
   }
 </starlight-head-generator-output>
 
@@ -86,16 +80,21 @@ const formats = ['js', 'yaml']
     }
   }
 
-  div {
+  pre {
     background-color: var(--color-slate-700);
     border-bottom-left-radius: var(--rounded);
     border-bottom-right-radius: var(--rounded);
     padding: var(--size-1) var(--size-2);
   }
 
-  div:focus-visible {
+  pre:focus-visible {
     outline: 2px solid var(--color-slate-200);
     outline-offset: 2px;
+  }
+
+  code {
+    font-size: var(--text-sm);
+    height: var(--size-24);
   }
 </style>
 
