@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>starlight-head-generator 🚧</h1>
-  <p>starlight-head-generator description</p>
+  <h1>starlight-head-generator 🤯</h1>
+  <p>Quickly generate the configuration to add custom tags to your Starlight website head.</p>
   <p>
-    <a href="https://dummyimage.com/520x350/121212/cdc8be.png&text=screenshot" title="Screenshot of starlight-head-generator">
-      <img alt="Screenshot of starlight-head-generator" src="https://dummyimage.com/520x350/121212/cdc8be.png&text=screenshot" width="520" />
+    <a href="https://i.imgur.com/liXWFvX.png" title="Screenshot of starlight-head-generator">
+      <img alt="Screenshot of starlight-head-generator" src="https://i.imgur.com/liXWFvX.png" width="520" />
     </a>
   </p>
 </div>
@@ -18,12 +18,9 @@
   <br />
 </div>
 
-## Features
+## Getting Started
 
-starlight-head-generator presentation.
-
-- starlight-head-generator feature 1
-- starlight-head-generator feature 2
+Head to the [starlight-head-generator website](https://starlight-head-generator.vercel.app/) and enter the tags to add to your Starlight `<head>`.
 
 ## License
 
