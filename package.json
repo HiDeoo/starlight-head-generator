@@ -17,6 +17,7 @@
     "@hideoo/eslint-config": "2.0.2",
     "@hideoo/prettier-config": "2.0.0",
     "@hideoo/tsconfig": "2.0.1",
+    "@types/node": "18.19.130",
     "@unocss/reset": "0.57.7",
     "astro": "3.5.5",
     "eslint": "8.54.0",
